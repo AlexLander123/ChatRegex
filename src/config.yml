@@ -1,0 +1,23 @@
+#===================Config for ChatRegex===================#
+#-------------------Format for new entry-------------------#
+#   <Entry Name>:
+#         world: '<World Name>'
+#         x: <X Coords>
+#         y: <Y Coords>
+#         z: <Z Coords>
+#         radius: <Radius>
+#         regex: '<The Regular Expression>'
+#         commands: #Use %player to replace player's name.
+#         - '<command #1>'
+#         - '<command #2>'
+
+locations:
+    test:
+        world: 'world'
+        x: 0
+        y: 0
+        z: 0
+        radius: 5
+        regex: '.*'
+        commands: #Use %player to replace player's name.
+        - 'say Hello %player!'
