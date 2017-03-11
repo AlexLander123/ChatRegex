@@ -7,6 +7,7 @@
 #         z: <Z Coords>
 #         radius: <Radius>
 #         regex: '<The Regular Expression>'
+#         action: 0-Do nothing, 1-Cancel the message, 2-Only show message to the player
 #         commands: #Use %player to replace player's name.
 #         - '<command #1>'
 #         - '<command #2>'
@@ -19,5 +20,6 @@ locations:
         z: 0
         radius: 5
         regex: '.*'
-        commands: #Use %player to replace player's name.
+        action: 0
+        commands:
         - 'say Hello %player!'

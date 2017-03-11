@@ -9,11 +9,13 @@ public class LocationConfig {
 	private int radius;
 	private Pattern regex;
 	private List<String> commands;
+	private int action;
 	
-	public LocationConfig(int radius, Pattern regex, List<String> commands) {
+	public LocationConfig(int radius, Pattern regex, List<String> commands, int action) {
 		this.radius = radius;
 		this.commands = commands;
 		this.regex = regex;
+		this.action = action;
 	}
 
 	public int getRadius() {
@@ -38,5 +40,13 @@ public class LocationConfig {
 
 	public void setCommands(List<String> commands) {
 		this.commands = commands;
+	}
+
+	public int getAction() {
+		return action;
+	}
+
+	public void setAction(int action) {
+		this.action = action;
 	}
 }
