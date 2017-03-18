@@ -4,26 +4,16 @@ package me.alexlander123.chatregex;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class LocationConfig {
+public class RegexConfig {
 	
-	private int radius;
 	private Pattern regex;
 	private List<String> commands;
 	private int action;
 	
-	public LocationConfig(int radius, Pattern regex, List<String> commands, int action) {
-		this.radius = radius;
+	public RegexConfig(Pattern regex, List<String> commands, int action) {
 		this.commands = commands;
 		this.regex = regex;
 		this.action = action;
-	}
-
-	public int getRadius() {
-		return radius;
-	}
-
-	public void setRadius(int radius) {
-		this.radius = radius;
 	}
 
 	public Pattern getRegex() {

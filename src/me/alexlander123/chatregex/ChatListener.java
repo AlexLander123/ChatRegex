@@ -1,11 +1,9 @@
 package me.alexlander123.chatregex;
 
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,21 +13,42 @@ public class ChatListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event){
-		for(Entry<Location, LocationConfig> entry : ChatRegex.config.entrySet()){
-			LocationConfig config = entry.getValue();
-			if(event.getPlayer().getLocation().distance(entry.getKey()) <= config.getRadius()){
-				Matcher matcher = config.getRegex().matcher(event.getMessage());
-				if(matcher.find()){
-					for(String command : config.getCommands()){
-						Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command.replaceAll("%player", event.getPlayer().getName()));
-					}
-					if(config.getAction() == 1){
-						event.setCancelled(true);
-					}
-					else if(config.getAction() == 2){
-						Set<Player> recipients = event.getRecipients();
-						recipients.clear();
-						recipients.add(event.getPlayer());
+		for(RegexConfig globalRegex : ChatRegex.globalConfig){
+			Matcher matcher = globalRegex.getRegex().matcher(event.getMessage());
+			if(matcher.find()){
+				for(String command : globalRegex.getCommands()){
+					command = command.replaceAll("%player", event.getPlayer().getName());
+					command = command.replaceAll("%message", event.getMessage());
+					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+				}
+				if(globalRegex.getAction() == 1){
+					event.setCancelled(true);
+				}
+				else if(globalRegex.getAction() == 2){
+					Set<Player> recipients = event.getRecipients();
+					recipients.clear();
+					recipients.add(event.getPlayer());
+				}
+			}
+		}
+		for(LocalRegexConfig localRegex : ChatRegex.config){
+			if(event.getPlayer().getWorld() == localRegex.getLocation().getWorld()){
+				if(event.getPlayer().getLocation().distance(localRegex.getLocation()) <= localRegex.getRadius()){
+					Matcher matcher = localRegex.getRegex().matcher(event.getMessage());
+					if(matcher.find()){
+						for(String command : localRegex.getCommands()){
+							command = command.replaceAll("%player", event.getPlayer().getName());
+							command = command.replaceAll("%message", event.getMessage());
+							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+						}
+						if(localRegex.getAction() == 1){
+							event.setCancelled(true);
+						}
+						else if(localRegex.getAction() == 2){
+							Set<Player> recipients = event.getRecipients();
+							recipients.clear();
+							recipients.add(event.getPlayer());
+						}
 					}
 				}
 			}

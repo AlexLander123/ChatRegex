@@ -8,11 +8,12 @@
 #         radius: <Radius>
 #         regex: '<The Regular Expression>'
 #         action: 0-Do nothing, 1-Cancel the message, 2-Only show message to the player
-#         commands: #Use %player to replace player's name.
+#         global: Is this a global regex
+#         commands: #Use the placeholder %player for player's name and %message for the message.
 #         - '<command #1>'
 #         - '<command #2>'
 
-locations:
+regexs:
     test:
         world: 'world'
         x: 0
@@ -21,5 +22,12 @@ locations:
         radius: 5
         regex: '.*'
         action: 0
+        global: false
+        commands:
+        - 'say Yes %player?'
+    global:
+        regex: 'Hello|Hi|Hola'
+        action: 0
+        global: true
         commands:
         - 'say Hello %player!'
