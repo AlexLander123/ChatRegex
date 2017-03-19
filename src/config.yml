@@ -9,9 +9,15 @@
 #         regex: '<The Regular Expression>'
 #         action: 0-Do nothing, 1-Cancel the message, 2-Only show message to the player
 #         global: Is this a global regex
-#         commands: #Use the placeholder %player for player's name and %message for the message.
+#         commands: #You may use placeholders.
 #         - '<command #1>'
 #         - '<command #2>'
+#
+#-----------------------Placeholders-----------------------#
+# %player - Player's name.
+# %message - Message sent.
+# %cg# - Capture group #.
+#
 
 regexs:
     test:

@@ -2,6 +2,7 @@ package me.alexlander123.chatregex;
 
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,12 +14,18 @@ public class ChatListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event){
+		Pattern captureGroupRegex = Pattern.compile("%cg([0-9]*)");
 		for(RegexConfig globalRegex : ChatRegex.globalConfig){
 			Matcher matcher = globalRegex.getRegex().matcher(event.getMessage());
 			if(matcher.find()){
 				for(String command : globalRegex.getCommands()){
 					command = command.replaceAll("%player", event.getPlayer().getName());
 					command = command.replaceAll("%message", event.getMessage());
+					Matcher cgMatcher = captureGroupRegex.matcher(command);
+					while(cgMatcher.find()){
+						int cgGroup = Integer.parseInt(cgMatcher.group(1));
+						command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
+					}
 					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
 				}
 				if(globalRegex.getAction() == 1){
@@ -39,6 +46,11 @@ public class ChatListener implements Listener {
 						for(String command : localRegex.getCommands()){
 							command = command.replaceAll("%player", event.getPlayer().getName());
 							command = command.replaceAll("%message", event.getMessage());
+							Matcher cgMatcher = captureGroupRegex.matcher(command);
+							while(cgMatcher.find()){
+								int cgGroup = Integer.parseInt(cgMatcher.group(1));
+								command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
+							}
 							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
 						}
 						if(localRegex.getAction() == 1){
