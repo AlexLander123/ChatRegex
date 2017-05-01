@@ -20,11 +20,13 @@ public class ChatRegex extends JavaPlugin{
 	public static Listener chatListener = new ChatListener();
 	public static ArrayList<LocalRegexConfig> config;
 	public static ArrayList<RegexConfig> globalConfig;
+	private static ChatRegex instance;
 	
 	@Override
 	public void onEnable() {
 		PluginDescriptionFile pdfFile = this.getDescription();
 		this.logger.info(pdfFile.getName() + " Version "  + pdfFile.getVersion() + " by " + pdfFile.getAuthors() + " Has Been Enabled!");
+		instance = this;
 		getServer().getPluginManager().registerEvents(chatListener, this);
 		config = new ArrayList<LocalRegexConfig>();
 		globalConfig = new ArrayList<RegexConfig>();
@@ -44,22 +46,25 @@ public class ChatRegex extends JavaPlugin{
 		for(String string : locations.keySet()){
 
 			//Check if config is empty
-			if(!getConfig().isSet("regexs." + string + ".x")){logger.log(Level.WARNING, "[ChatRegex] X Coordinate is missing from the entry: " + string); continue;}
-			if(!getConfig().isSet("regexs." + string + ".y")){logger.log(Level.WARNING, "[ChatRegex] Y Coordinate is missing from the entry: " + string); continue;}
-			if(!getConfig().isSet("regexs." + string + ".z")){logger.log(Level.WARNING, "[ChatRegex] Z Coordinate is missing from the entry: " + string); continue;}
-			if(!getConfig().isSet("regexs." + string + ".world")){logger.log(Level.WARNING, "[ChatRegex] World is missing from the entry: " + string); continue;}
-			if(!getConfig().isSet("regexs." + string + ".radius")){logger.log(Level.WARNING, "[ChatRegex] Radius is missing from the entry: " + string); continue;}
 			if(!getConfig().isSet("regexs." + string + ".action")){logger.log(Level.WARNING, "[ChatRegex] The option action is missing from the entry: " + string); continue;}
 			if(!getConfig().isSet("regexs." + string + ".global")){logger.log(Level.WARNING, "[ChatRegex] The option global is missing from the entry: " + string); continue;}
 			if(!getConfig().isSet("regexs." + string + ".regex")){logger.log(Level.WARNING, "[ChatRegex] Regex is missing from the entry: " + string); continue;}
 			if(!getConfig().isSet("regexs." + string + ".commands")){logger.log(Level.WARNING, "[ChatRegex] Command(s) is missing from the entry: " + string); continue;}
 
-			if(getConfig().getString("regexs." + string + ".world") == null){logger.log(Level.WARNING, "[ChatRegex] World is invalid from the entry: " + string); continue;}
-
 			int action = getConfig().getInt("regexs." + string + ".action");
 			Pattern regex = Pattern.compile(getConfig().getString("regexs." + string + ".regex"));
 			List<String> commands = getConfig().getStringList("regexs." + string + ".commands");
 			if(getConfig().getBoolean("regexs." + string + ".global") == false){
+				
+				//Check if config is empty
+				if(!getConfig().isSet("regexs." + string + ".x")){logger.log(Level.WARNING, "[ChatRegex] X Coordinate is missing from the entry: " + string); continue;}
+				if(!getConfig().isSet("regexs." + string + ".y")){logger.log(Level.WARNING, "[ChatRegex] Y Coordinate is missing from the entry: " + string); continue;}
+				if(!getConfig().isSet("regexs." + string + ".z")){logger.log(Level.WARNING, "[ChatRegex] Z Coordinate is missing from the entry: " + string); continue;}
+				if(!getConfig().isSet("regexs." + string + ".world")){logger.log(Level.WARNING, "[ChatRegex] World is missing from the entry: " + string); continue;}
+				if(!getConfig().isSet("regexs." + string + ".radius")){logger.log(Level.WARNING, "[ChatRegex] Radius is missing from the entry: " + string); continue;}
+				
+				if(getConfig().getString("regexs." + string + ".world") == null){logger.log(Level.WARNING, "[ChatRegex] World is invalid from the entry: " + string); continue;}
+				
 				World world = Bukkit.getWorld(getConfig().getString("regexs." + string + ".world"));
 				int x = getConfig().getInt("regexs." + string + ".x");
 				int y = getConfig().getInt("regexs." + string + ".y");
@@ -71,6 +76,10 @@ public class ChatRegex extends JavaPlugin{
 				globalConfig.add(new RegexConfig(regex, commands, action));
 			}
 		}
+	}
+
+	public static ChatRegex getInstance() {
+		return instance;
 	}
 
 }

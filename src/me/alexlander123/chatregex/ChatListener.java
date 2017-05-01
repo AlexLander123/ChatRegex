@@ -12,6 +12,22 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
 	
+	class ExecuteCommand implements Runnable {
+		
+		private String command;
+		
+		public ExecuteCommand(String command) {
+			this.command = command;
+		}
+
+		@Override
+		public void run() {
+			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+			
+		}
+		
+	}
+	
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent event){
 		Pattern captureGroupRegex = Pattern.compile("%cg([0-9]*)");
@@ -19,14 +35,18 @@ public class ChatListener implements Listener {
 			Matcher matcher = globalRegex.getRegex().matcher(event.getMessage());
 			if(matcher.find()){
 				for(String command : globalRegex.getCommands()){
+					
 					command = command.replaceAll("%player", event.getPlayer().getName());
 					command = command.replaceAll("%message", event.getMessage());
+					
 					Matcher cgMatcher = captureGroupRegex.matcher(command);
 					while(cgMatcher.find()){
 						int cgGroup = Integer.parseInt(cgMatcher.group(1));
 						command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
 					}
-					Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+					
+					Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+					
 				}
 				if(globalRegex.getAction() == 1){
 					event.setCancelled(true);
@@ -44,15 +64,20 @@ public class ChatListener implements Listener {
 					Matcher matcher = localRegex.getRegex().matcher(event.getMessage());
 					if(matcher.find()){
 						for(String command : localRegex.getCommands()){
+							
 							command = command.replaceAll("%player", event.getPlayer().getName());
 							command = command.replaceAll("%message", event.getMessage());
+							
 							Matcher cgMatcher = captureGroupRegex.matcher(command);
 							while(cgMatcher.find()){
 								int cgGroup = Integer.parseInt(cgMatcher.group(1));
 								command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
 							}
-							Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
+							
+							Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+							
 						}
+						
 						if(localRegex.getAction() == 1){
 							event.setCancelled(true);
 						}
