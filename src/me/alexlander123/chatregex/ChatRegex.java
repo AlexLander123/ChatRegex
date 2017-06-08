@@ -8,8 +8,11 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,13 +33,14 @@ public class ChatRegex extends JavaPlugin{
 		getServer().getPluginManager().registerEvents(chatListener, this);
 		config = new ArrayList<LocalRegexConfig>();
 		globalConfig = new ArrayList<RegexConfig>();
-		getConfig().options().copyDefaults(true);
-		saveConfig();
+		saveDefaultConfig();
 		loadConfig();
 	}
 	
 	@Override
 	public void onDisable() {
+		config = null;
+		globalConfig = null;
 		PluginDescriptionFile pdfFile = this.getDescription();
 		this.logger.info(pdfFile.getName() + " Has Been Disabled!");
 	}
@@ -82,4 +86,20 @@ public class ChatRegex extends JavaPlugin{
 		return instance;
 	}
 
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
+		if(label.equalsIgnoreCase("chatregexreload") || label.equalsIgnoreCase("crreload")){
+			if(sender.hasPermission("chatregex.reload")){
+				reloadConfig();
+				saveConfig();
+				config.clear();
+				globalConfig.clear();
+				loadConfig();
+				sender.sendMessage(ChatColor.GREEN + "[ChatRegex] Configuration Reloaded!");
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
 }
