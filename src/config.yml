@@ -9,10 +9,9 @@
 #         regex: '<The Regular Expression>'
 #         action: 0-Do nothing, 1-Cancel the message, 2-Only show message to the player
 #         global: Is this a global regex
-#         commands: #You may use placeholders.
-#         - '<command #1>'
-#         - '<command #2>'
-#
+#         commands: #You may use placeholders. #If the delay(d) is not specified it will default to 0 seconds.
+#         - c="<command #1>" d=<delay in seconds>
+#         - c="<command #2>"
 #-----------------------Placeholders-----------------------#
 # %player - Player's name.
 # %message - Message sent.
@@ -30,10 +29,10 @@ regexs:
         action: 0
         global: false
         commands:
-        - 'say Yes %player?'
+        - c="say Yes %player?"
     global:
         regex: 'Hello|Hi|Hola'
         action: 0
         global: true
         commands:
-        - 'say Hello %player!'
+        - c="say Hello %player!" d=9

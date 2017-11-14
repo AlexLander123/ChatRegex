@@ -11,7 +11,7 @@ public class LocalRegexConfig extends RegexConfig{
 	private Location location;
 	private int radius;
 	
-	public LocalRegexConfig(Location location, int radius, Pattern regex, List<String> commands, int action) {
+	public LocalRegexConfig(Location location, int radius, Pattern regex, List<CommandEntry> commands, int action) {
 		super(regex, commands, action);
 		this.setLocation(location);
 		this.radius = radius;

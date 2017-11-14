@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
@@ -57,7 +58,22 @@ public class ChatRegex extends JavaPlugin{
 
 			int action = getConfig().getInt("regexs." + string + ".action");
 			Pattern regex = Pattern.compile(getConfig().getString("regexs." + string + ".regex"));
-			List<String> commands = getConfig().getStringList("regexs." + string + ".commands");
+			
+			//Parse commands
+			List<CommandEntry> commands = new ArrayList<CommandEntry>();
+			Pattern commandEntryPattern = Pattern.compile("^\\s*c=\"(.+)\"(\\s+d=(\\d+))?\\s*$");
+			
+			for(String commandConfigEntry : getConfig().getStringList("regexs." + string + ".commands")){
+				Matcher commandEntryMatcher = commandEntryPattern.matcher(commandConfigEntry);
+				if(commandEntryMatcher.matches()) {
+					commands.add(new CommandEntry(commandEntryMatcher.group(1), (commandEntryMatcher.group(3) == null) ? 0 : Integer.parseInt(commandEntryMatcher.group(3))));
+				}
+				else{
+					logger.log(Level.WARNING, "[ChatRegex] The command " + commandConfigEntry + " from the entry: " + string + " is using a invalid format. Ignoring the command.");
+					continue;
+				}
+			}
+						
 			if(getConfig().getBoolean("regexs." + string + ".global") == false){
 				
 				//Check if config is empty

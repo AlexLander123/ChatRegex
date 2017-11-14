@@ -34,7 +34,9 @@ public class ChatListener implements Listener {
 		for(RegexConfig globalRegex : ChatRegex.globalConfig){
 			Matcher matcher = globalRegex.getRegex().matcher(event.getMessage());
 			if(matcher.find()){
-				for(String command : globalRegex.getCommands()){
+				for(CommandEntry commandEntry : globalRegex.getCommands()){
+					
+					String command = commandEntry.getCommand();
 					
 					command = command.replaceAll("%player", event.getPlayer().getName());
 					command = command.replaceAll("%message", event.getMessage());
@@ -45,7 +47,12 @@ public class ChatListener implements Listener {
 						command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
 					}
 					
-					Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+					if(commandEntry.getDelay() == 0){
+						Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+					}
+					else{
+						Bukkit.getScheduler().runTaskLater(ChatRegex.getInstance(), new ExecuteCommand(command), commandEntry.getDelay() * 20);
+					}
 					
 				}
 				if(globalRegex.getAction() == 1){
@@ -63,7 +70,9 @@ public class ChatListener implements Listener {
 				if(event.getPlayer().getLocation().distance(localRegex.getLocation()) <= localRegex.getRadius()){
 					Matcher matcher = localRegex.getRegex().matcher(event.getMessage());
 					if(matcher.find()){
-						for(String command : localRegex.getCommands()){
+						for(CommandEntry commandEntry : localRegex.getCommands()){
+							
+							String command = commandEntry.getCommand();
 							
 							command = command.replaceAll("%player", event.getPlayer().getName());
 							command = command.replaceAll("%message", event.getMessage());
@@ -74,7 +83,12 @@ public class ChatListener implements Listener {
 								command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
 							}
 							
-							Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+							if(commandEntry.getDelay() == 0){
+								Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+							}
+							else{
+								Bukkit.getScheduler().runTaskLater(ChatRegex.getInstance(), new ExecuteCommand(command), commandEntry.getDelay() * 20);
+							}
 							
 						}
 						

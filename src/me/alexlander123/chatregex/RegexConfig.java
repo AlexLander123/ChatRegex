@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
 public class RegexConfig {
 	
 	private Pattern regex;
-	private List<String> commands;
+	private List<CommandEntry> commands;
 	private int action;
 	
-	public RegexConfig(Pattern regex, List<String> commands, int action) {
+	public RegexConfig(Pattern regex, List<CommandEntry> commands, int action) {
 		this.commands = commands;
 		this.regex = regex;
 		this.action = action;
@@ -24,11 +24,11 @@ public class RegexConfig {
 		this.regex = regex;
 	}
 
-	public List<String> getCommands() {
+	public List<CommandEntry> getCommands() {
 		return commands;
 	}
 
-	public void setCommands(List<String> commands) {
+	public void setCommands(List<CommandEntry> commands) {
 		this.commands = commands;
 	}
 
