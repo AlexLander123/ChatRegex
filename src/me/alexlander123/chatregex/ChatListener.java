@@ -29,76 +29,81 @@ public class ChatListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerChat(AsyncPlayerChatEvent event){
+	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Pattern captureGroupRegex = Pattern.compile("%cg([0-9]*)");
-		for(RegexConfig globalRegex : ChatRegex.globalConfig){
-			Matcher matcher = globalRegex.getRegex().matcher(event.getMessage());
-			if(matcher.find()){
-				for(CommandEntry commandEntry : globalRegex.getCommands()){
-					
-					String command = commandEntry.getCommand();
-					
-					command = command.replaceAll("%player", event.getPlayer().getName());
-					command = command.replaceAll("%message", event.getMessage());
-					
-					Matcher cgMatcher = captureGroupRegex.matcher(command);
-					while(cgMatcher.find()){
-						int cgGroup = Integer.parseInt(cgMatcher.group(1));
-						command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
+		for (RegexConfig globalRegex : ChatRegex.globalConfig) {
+			if (globalRegex.canExecute(event.getPlayer().getUniqueId())) {
+				Matcher matcher = globalRegex.getRegex().matcher(event.getMessage());
+				if (matcher.find()) {
+					for (CommandEntry commandEntry : globalRegex.getCommands()) {
+
+						String command = commandEntry.getCommand();
+
+						command = command.replaceAll("%player", event.getPlayer().getName());
+						command = command.replaceAll("%message", event.getMessage());
+
+						Matcher cgMatcher = captureGroupRegex.matcher(command);
+						while (cgMatcher.find()) {
+							int cgGroup = Integer.parseInt(cgMatcher.group(1));
+							command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
+						}
+
+						if (commandEntry.getDelay() == 0) {
+							Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+						} else {
+							Bukkit.getScheduler().runTaskLater(ChatRegex.getInstance(), new ExecuteCommand(command), commandEntry.getDelay() * 20);
+						}
+
 					}
-					
-					if(commandEntry.getDelay() == 0){
-						Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+
+					if (globalRegex.getAction() == 1) {
+						event.setCancelled(true);
+					} else if (globalRegex.getAction() == 2) {
+						Set<Player> recipients = event.getRecipients();
+						recipients.clear();
+						recipients.add(event.getPlayer());
 					}
-					else{
-						Bukkit.getScheduler().runTaskLater(ChatRegex.getInstance(), new ExecuteCommand(command), commandEntry.getDelay() * 20);
-					}
-					
-				}
-				if(globalRegex.getAction() == 1){
-					event.setCancelled(true);
-				}
-				else if(globalRegex.getAction() == 2){
-					Set<Player> recipients = event.getRecipients();
-					recipients.clear();
-					recipients.add(event.getPlayer());
+
+					globalRegex.setLastExecutionTime(event.getPlayer().getUniqueId());
 				}
 			}
 		}
-		for(LocalRegexConfig localRegex : ChatRegex.config){
-			if(event.getPlayer().getWorld() == localRegex.getLocation().getWorld()){
-				if(event.getPlayer().getLocation().distance(localRegex.getLocation()) <= localRegex.getRadius()){
-					Matcher matcher = localRegex.getRegex().matcher(event.getMessage());
-					if(matcher.find()){
-						for(CommandEntry commandEntry : localRegex.getCommands()){
-							
-							String command = commandEntry.getCommand();
-							
-							command = command.replaceAll("%player", event.getPlayer().getName());
-							command = command.replaceAll("%message", event.getMessage());
-							
-							Matcher cgMatcher = captureGroupRegex.matcher(command);
-							while(cgMatcher.find()){
-								int cgGroup = Integer.parseInt(cgMatcher.group(1));
-								command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
+		for (LocalRegexConfig localRegex : ChatRegex.config) {
+			if (localRegex.canExecute(event.getPlayer().getUniqueId())) {
+				if (event.getPlayer().getWorld() == localRegex.getLocation().getWorld()) {
+					if (event.getPlayer().getLocation().distance(localRegex.getLocation()) <= localRegex.getRadius()) {
+						Matcher matcher = localRegex.getRegex().matcher(event.getMessage());
+						if (matcher.find()) {
+							for (CommandEntry commandEntry : localRegex.getCommands()) {
+
+								String command = commandEntry.getCommand();
+
+								command = command.replaceAll("%player", event.getPlayer().getName());
+								command = command.replaceAll("%message", event.getMessage());
+
+								Matcher cgMatcher = captureGroupRegex.matcher(command);
+								while (cgMatcher.find()) {
+									int cgGroup = Integer.parseInt(cgMatcher.group(1));
+									command = command.replaceAll("%cg" + cgGroup, matcher.group(cgGroup));
+								}
+
+								if (commandEntry.getDelay() == 0) {
+									Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+								} else {
+									Bukkit.getScheduler().runTaskLater(ChatRegex.getInstance(), new ExecuteCommand(command), commandEntry.getDelay() * 20);
+								}
+
 							}
-							
-							if(commandEntry.getDelay() == 0){
-								Bukkit.getScheduler().runTask(ChatRegex.getInstance(), new ExecuteCommand(command));
+
+							if (localRegex.getAction() == 1) {
+								event.setCancelled(true);
+							} else if (localRegex.getAction() == 2) {
+								Set<Player> recipients = event.getRecipients();
+								recipients.clear();
+								recipients.add(event.getPlayer());
 							}
-							else{
-								Bukkit.getScheduler().runTaskLater(ChatRegex.getInstance(), new ExecuteCommand(command), commandEntry.getDelay() * 20);
-							}
-							
-						}
-						
-						if(localRegex.getAction() == 1){
-							event.setCancelled(true);
-						}
-						else if(localRegex.getAction() == 2){
-							Set<Player> recipients = event.getRecipients();
-							recipients.clear();
-							recipients.add(event.getPlayer());
+
+							localRegex.setLastExecutionTime(event.getPlayer().getUniqueId());
 						}
 					}
 				}

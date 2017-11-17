@@ -49,14 +49,45 @@ public class ChatRegex extends JavaPlugin{
 	public void loadConfig() {
 		Map<String, Object> locations = this.getConfig().getConfigurationSection("regexs").getValues(false);
 		for(String string : locations.keySet()){
+			
+			int action = 0;
+			int cooldown = 0;
+			boolean isGlobal = true;
+			boolean isGlobalCooldown = true;
 
-			//Check if config is empty
-			if(!getConfig().isSet("regexs." + string + ".action")){logger.log(Level.WARNING, "[ChatRegex] The option action is missing from the entry: " + string); continue;}
-			if(!getConfig().isSet("regexs." + string + ".global")){logger.log(Level.WARNING, "[ChatRegex] The option global is missing from the entry: " + string); continue;}
+			//Check if config is empty and setting values
+			
+			if(!getConfig().isSet("regexs." + string + ".action")){
+				logger.log(Level.WARNING, "[ChatRegex] The option action is missing from the entry: " + string + ". Using default value of 0"); 
+			} 
+			else {
+				action = getConfig().getInt("regexs." + string + ".action");
+			}
+			
+			if(!getConfig().isSet("regexs." + string + ".global")){
+				logger.log(Level.WARNING, "[ChatRegex] The option global is missing from the entry: " + string + ". Using default value of true"); 
+			}
+			else {
+				isGlobal = getConfig().getBoolean("regexs." + string + ".global");
+			}
+			
+			if(!getConfig().isSet("regexs." + string + ".cooldown")){
+				logger.log(Level.WARNING, "[ChatRegex] The option cooldown is missing from the entry: " + string + ". Using default value of 0");
+			}
+			else {
+				cooldown = getConfig().getInt("regexs." + string + ".cooldown");
+			}
+			
+			if(!getConfig().isSet("regexs." + string + ".global cooldown")){
+				logger.log(Level.WARNING, "[ChatRegex] The option global cooldown is missing from the entry: " + string + ". Using default value of true");
+			}
+			else {
+				isGlobalCooldown = getConfig().getBoolean("regexs." + string + ".global cooldown");
+			}
+			
 			if(!getConfig().isSet("regexs." + string + ".regex")){logger.log(Level.WARNING, "[ChatRegex] Regex is missing from the entry: " + string); continue;}
 			if(!getConfig().isSet("regexs." + string + ".commands")){logger.log(Level.WARNING, "[ChatRegex] Command(s) is missing from the entry: " + string); continue;}
-
-			int action = getConfig().getInt("regexs." + string + ".action");
+			
 			Pattern regex = Pattern.compile(getConfig().getString("regexs." + string + ".regex"));
 			
 			//Parse commands
@@ -74,7 +105,7 @@ public class ChatRegex extends JavaPlugin{
 				}
 			}
 						
-			if(getConfig().getBoolean("regexs." + string + ".global") == false){
+			if(isGlobal == false){
 				
 				//Check if config is empty
 				if(!getConfig().isSet("regexs." + string + ".x")){logger.log(Level.WARNING, "[ChatRegex] X Coordinate is missing from the entry: " + string); continue;}
@@ -83,17 +114,17 @@ public class ChatRegex extends JavaPlugin{
 				if(!getConfig().isSet("regexs." + string + ".world")){logger.log(Level.WARNING, "[ChatRegex] World is missing from the entry: " + string); continue;}
 				if(!getConfig().isSet("regexs." + string + ".radius")){logger.log(Level.WARNING, "[ChatRegex] Radius is missing from the entry: " + string); continue;}
 				
-				if(getConfig().getString("regexs." + string + ".world") == null){logger.log(Level.WARNING, "[ChatRegex] World is invalid from the entry: " + string); continue;}
+				if(Bukkit.getWorld(getConfig().getString("regexs." + string + ".world")) == null){logger.log(Level.WARNING, "[ChatRegex] World is invalid from the entry: " + string); continue;}
 				
 				World world = Bukkit.getWorld(getConfig().getString("regexs." + string + ".world"));
 				int x = getConfig().getInt("regexs." + string + ".x");
 				int y = getConfig().getInt("regexs." + string + ".y");
 				int z = getConfig().getInt("regexs." + string + ".z");
 				int radius = getConfig().getInt("regexs." + string + ".radius");
-				config.add(new LocalRegexConfig(new Location(world, x, y, z), radius, regex, commands, action));
+				config.add(new LocalRegexConfig(new Location(world, x, y, z), radius, regex, commands, action, cooldown, isGlobalCooldown));
 			} 
 			else{
-				globalConfig.add(new RegexConfig(regex, commands, action));
+				globalConfig.add(new RegexConfig(regex, commands, action, cooldown, isGlobalCooldown));
 			}
 		}
 	}
