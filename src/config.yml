@@ -7,10 +7,12 @@
 #         z: <Z Coords>
 #         radius: <Radius>
 #         regex: '<The Regular Expression>'
+#         add-nodes: <node #1>,<node #2> #Nodes to be added when the Regex is triggered.
 #         action: 0-Do nothing, 1-Cancel the message, 2-Only show message to the player (Default value is 0)
 #         global: Is this a global regex (Default value is true)
 #         cooldown: <Cooldown time is seconds> (Default value is 0)
-#         global cooldown: Is the cooldown a global cooldown? #If the value is false it will be a per-player cooldown. (Default value is true)
+#         global-cooldown: Is the cooldown a global cooldown? #If the value is false it will be a per-player cooldown. (Default value is true)
+#         nodes: <node #1>,<node #2> #The required nodes.
 #         commands: #You may use placeholders. #If the delay(d) is not specified it will default to 0 seconds.
 #         - c="<command #1>" d=<delay in seconds>
 #         - c="<command #2>"
@@ -30,13 +32,15 @@ regexs:
         regex: '.*'
         action: 0
         global: false
+        nodes: Test1, Test2
         commands:
         - c="say Yes %player?"
     global:
         regex: 'Hello|Hi|Hola'
+        add-nodes: Test1, Test2
         action: 0
         global: true
         cooldown: 5
-        global cooldown: true
+        global-cooldown: true
         commands:
         - c="say Hello %player!" d=9

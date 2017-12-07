@@ -1,8 +1,10 @@
 package me.alexlander123.chatregex;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -22,8 +24,9 @@ public class ChatRegex extends JavaPlugin{
 	
 	public Logger logger = Logger.getLogger("Minecraft");
 	public static Listener chatListener = new ChatListener();
-	public static ArrayList<LocalRegexConfig> config;
+	public static ArrayList<LocalRegexConfig> localConfig;
 	public static ArrayList<RegexConfig> globalConfig;
+	public static HashMap<UUID, List<String>> playerNodes;
 	private static ChatRegex instance;
 	
 	@Override
@@ -32,16 +35,18 @@ public class ChatRegex extends JavaPlugin{
 		this.logger.info(pdfFile.getName() + " Version "  + pdfFile.getVersion() + " by " + pdfFile.getAuthors() + " Has Been Enabled!");
 		instance = this;
 		getServer().getPluginManager().registerEvents(chatListener, this);
-		config = new ArrayList<LocalRegexConfig>();
+		localConfig = new ArrayList<LocalRegexConfig>();
 		globalConfig = new ArrayList<RegexConfig>();
+		playerNodes = new HashMap<UUID, List<String>>();
 		saveDefaultConfig();
 		loadConfig();
 	}
 	
 	@Override
 	public void onDisable() {
-		config = null;
+		localConfig = null;
 		globalConfig = null;
+		playerNodes = null;
 		PluginDescriptionFile pdfFile = this.getDescription();
 		this.logger.info(pdfFile.getName() + " Has Been Disabled!");
 	}
@@ -54,6 +59,8 @@ public class ChatRegex extends JavaPlugin{
 			int cooldown = 0;
 			boolean isGlobal = true;
 			boolean isGlobalCooldown = true;
+			String addNode = "";
+			String node= "";
 
 			//Check if config is empty and setting values
 			
@@ -78,11 +85,19 @@ public class ChatRegex extends JavaPlugin{
 				cooldown = getConfig().getInt("regexs." + string + ".cooldown");
 			}
 			
-			if(!getConfig().isSet("regexs." + string + ".global cooldown")){
-				logger.log(Level.WARNING, "[ChatRegex] The option global cooldown is missing from the entry: " + string + ". Using default value of true");
+			if(!getConfig().isSet("regexs." + string + ".global-cooldown")){
+				logger.log(Level.WARNING, "[ChatRegex] The option global-cooldown is missing from the entry: " + string + ". Using default value of true");
 			}
 			else {
-				isGlobalCooldown = getConfig().getBoolean("regexs." + string + ".global cooldown");
+				isGlobalCooldown = getConfig().getBoolean("regexs." + string + ".global-cooldown");
+			}
+			
+			if(getConfig().isSet("regexs." + string + ".add-nodes")){
+				addNode = getConfig().getString("regexs." + string + ".add-nodes");
+			}
+			
+			if(getConfig().isSet("regexs." + string + ".nodes")){
+				node = getConfig().getString("regexs." + string + ".nodes");
 			}
 			
 			if(!getConfig().isSet("regexs." + string + ".regex")){logger.log(Level.WARNING, "[ChatRegex] Regex is missing from the entry: " + string); continue;}
@@ -121,10 +136,10 @@ public class ChatRegex extends JavaPlugin{
 				int y = getConfig().getInt("regexs." + string + ".y");
 				int z = getConfig().getInt("regexs." + string + ".z");
 				int radius = getConfig().getInt("regexs." + string + ".radius");
-				config.add(new LocalRegexConfig(new Location(world, x, y, z), radius, regex, commands, action, cooldown, isGlobalCooldown));
+				localConfig.add(new LocalRegexConfig(new Location(world, x, y, z), radius, regex, commands, action, cooldown, isGlobalCooldown, addNode, node));
 			} 
 			else{
-				globalConfig.add(new RegexConfig(regex, commands, action, cooldown, isGlobalCooldown));
+				globalConfig.add(new RegexConfig(regex, commands, action, cooldown, isGlobalCooldown, addNode, node));
 			}
 		}
 	}
@@ -139,7 +154,7 @@ public class ChatRegex extends JavaPlugin{
 			if(sender.hasPermission("chatregex.reload")){
 				reloadConfig();
 				saveConfig();
-				config.clear();
+				localConfig.clear();
 				globalConfig.clear();
 				loadConfig();
 				sender.sendMessage(ChatColor.GREEN + "[ChatRegex] Configuration Reloaded!");
