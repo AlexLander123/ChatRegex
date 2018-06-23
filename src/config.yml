@@ -13,6 +13,9 @@
 #         cooldown: <Cooldown time is seconds> (Default value is 0)
 #         global-cooldown: Is the cooldown a global cooldown? #If the value is false it will be a per-player cooldown. (Default value is true)
 #         nodes: <node #1>,<node #2> #The required nodes.
+#         permissions:
+#         - test.permissiontohave #Permissions that the player must have
+#         - -test.permissionstonothave #Permissions that the player must not have (It has a "-" before the permission)
 #         commands: #You may use placeholders. #If the delay(d) is not specified it will default to 0 seconds.
 #         - c="<command #1>" d=<delay in seconds>
 #         - c="<command #2>"
@@ -33,6 +36,9 @@ regexs:
         action: 0
         global: false
         nodes: Test1, Test2
+        permissions:
+        - test.permissiontohave
+        - -test.permissionstonothave
         commands:
         - c="say Yes %player?"
     global:
@@ -42,5 +48,8 @@ regexs:
         global: true
         cooldown: 5
         global-cooldown: true
+        permissions:
+        - test.permissiontohave
+        - -test.permissionstonothave
         commands:
         - c="say Hello %player!" d=9

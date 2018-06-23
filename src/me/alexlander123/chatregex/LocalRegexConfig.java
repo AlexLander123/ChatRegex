@@ -13,8 +13,8 @@ public class LocalRegexConfig extends RegexConfig{
 	private Location location;
 	private int radius;
 	
-	public LocalRegexConfig(Location location, int radius, Pattern regex, List<CommandEntry> commands, int action,  int cooldown, boolean globalCooldown, String addNode, String node) {
-		super(regex, commands, action, cooldown, globalCooldown, addNode, node);
+	public LocalRegexConfig(Location location, int radius, Pattern regex, List<CommandEntry> commands, List<String> permissions, int action,  int cooldown, boolean globalCooldown, String addNode, String node) {
+		super(regex, commands, permissions, action, cooldown, globalCooldown, addNode, node);
 		this.setLocation(location);
 		this.radius = radius;
 	}

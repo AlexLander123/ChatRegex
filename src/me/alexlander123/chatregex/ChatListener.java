@@ -33,7 +33,6 @@ public class ChatListener implements Listener {
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		for (RegexConfig globalRegex : ChatRegex.globalConfig) {
 			if (globalRegex.canExecute(event.getPlayer().getUniqueId())) {
-				Bukkit.broadcastMessage("Pass");
 				execute(event, globalRegex);
 			}
 		}

@@ -61,6 +61,7 @@ public class ChatRegex extends JavaPlugin{
 			boolean isGlobalCooldown = true;
 			String addNode = "";
 			String node= "";
+			List<String> permissions = new ArrayList<String>();
 
 			//Check if config is empty and setting values
 			
@@ -100,6 +101,10 @@ public class ChatRegex extends JavaPlugin{
 				node = getConfig().getString("regexs." + string + ".nodes");
 			}
 			
+			if(getConfig().isSet("regexs." + string + ".permissions")){
+				permissions = getConfig().getStringList("regexs." + string + ".permissions");
+			}
+			
 			if(!getConfig().isSet("regexs." + string + ".regex")){logger.log(Level.WARNING, "[ChatRegex] Regex is missing from the entry: " + string); continue;}
 			if(!getConfig().isSet("regexs." + string + ".commands")){logger.log(Level.WARNING, "[ChatRegex] Command(s) is missing from the entry: " + string); continue;}
 			
@@ -136,10 +141,10 @@ public class ChatRegex extends JavaPlugin{
 				int y = getConfig().getInt("regexs." + string + ".y");
 				int z = getConfig().getInt("regexs." + string + ".z");
 				int radius = getConfig().getInt("regexs." + string + ".radius");
-				localConfig.add(new LocalRegexConfig(new Location(world, x, y, z), radius, regex, commands, action, cooldown, isGlobalCooldown, addNode, node));
+				localConfig.add(new LocalRegexConfig(new Location(world, x, y, z), radius, regex, commands, permissions, action, cooldown, isGlobalCooldown, addNode, node));
 			} 
 			else{
-				globalConfig.add(new RegexConfig(regex, commands, action, cooldown, isGlobalCooldown, addNode, node));
+				globalConfig.add(new RegexConfig(regex, commands, permissions, action, cooldown, isGlobalCooldown, addNode, node));
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class RegexConfig {
 	
@@ -21,8 +22,10 @@ public class RegexConfig {
 	private long lastExecutionTime;
 	private List<String> addNodes;
 	private List<String> nodes;
+	private List<String> permissionsToHave;
+	private List<String> permissionsNotToHave;
 	
-	public RegexConfig(Pattern regex, List<CommandEntry> commands, int action, int cooldown, boolean globalCooldown, String addNode, String node) {
+	public RegexConfig(Pattern regex, List<CommandEntry> commands, List<String> permissions, int action, int cooldown, boolean globalCooldown, String addNode, String node) {
 		this.commands = commands;
 		this.regex = regex;
 		this.action = action;
@@ -45,48 +48,31 @@ public class RegexConfig {
 		
 		//Parse Nodes
 		if(!node.isEmpty()) {
-			Bukkit.broadcastMessage("Check");
 			nodes = Arrays.asList(node.split(",\\s*"));
 			for (int i = 0; i < nodes.size(); i++) {
 				nodes.set(i, nodes.get(i).trim());
 			}
 		}
-	}
-
-	public int getCooldown() {
-		return cooldown;
-	}
-
-	public void setCooldown(int cooldown) {
-		this.cooldown = cooldown;
-	}
-
-	public Pattern getRegex() {
-		return regex;
-	}
-
-	public void setRegex(Pattern regex) {
-		this.regex = regex;
-	}
-
-	public List<CommandEntry> getCommands() {
-		return commands;
-	}
-
-	public void setCommands(List<CommandEntry> commands) {
-		this.commands = commands;
-	}
-
-	public int getAction() {
-		return action;
-	}
-
-	public void setAction(int action) {
-		this.action = action;
+		
+		//Parse permissions
+		if(!permissions.isEmpty()) {
+			
+			permissionsToHave = new ArrayList<String>();
+			permissionsNotToHave = new ArrayList<String>();
+			
+			for(String permission : permissions) {
+				if(permission.startsWith("-")) {
+					permissionsNotToHave.add(permission.substring(1));
+				}
+				else {
+					permissionsToHave.add(permission);
+				}
+			}
+		}
 	}
 	
 	public boolean canExecute(UUID player){
-		return checkTime(player) && checkNodes(player);
+		return checkTime(player) && checkNodes(player) && checkPermissions(player);
 	}
 	
 	public boolean checkTime(UUID player){
@@ -121,7 +107,66 @@ public class RegexConfig {
 		}
 		return false;
 	}
+	
+	public boolean checkPermissions(UUID playerUUID) {
+		
+		Player player = Bukkit.getPlayer(playerUUID);
+		
+		//Check if there is a requirement of permissions
+		if(permissionsToHave != null || !permissionsToHave.isEmpty()) {
+			//Check if player has required permissions
+			for(String permission : permissionsToHave) {
+				if(!player.hasPermission(permission)) {
+					return false;
+				}
+			}
+		}
+		
+		//Check if there is a requirement to not have certain permissions
+		if(permissionsNotToHave != null || !permissionsNotToHave.isEmpty()) {
+			//Check if player has permissions that they must not have
+			for(String permission : permissionsNotToHave) {
+				if(player.hasPermission(permission)) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
 
+	public int getCooldown() {
+		return cooldown;
+	}
+
+	public void setCooldown(int cooldown) {
+		this.cooldown = cooldown;
+	}
+
+	public Pattern getRegex() {
+		return regex;
+	}
+
+	public void setRegex(Pattern regex) {
+		this.regex = regex;
+	}
+
+	public List<CommandEntry> getCommands() {
+		return commands;
+	}
+
+	public void setCommands(List<CommandEntry> commands) {
+		this.commands = commands;
+	}
+
+	public int getAction() {
+		return action;
+	}
+
+	public void setAction(int action) {
+		this.action = action;
+	}
+	
 	public void setLastExecutionTime(UUID player){
 		if(globalCooldown == true) {
 			this.lastExecutionTime = System.currentTimeMillis();
@@ -144,6 +189,22 @@ public class RegexConfig {
 				playerNodes.get(player).add(addNode);
 			}
 		}
+	}
+
+	public List<String> getPermissionsToHave() {
+		return permissionsToHave;
+	}
+
+	public void setPermissionsToHave(List<String> permissionToHave) {
+		this.permissionsToHave = permissionToHave;
+	}
+
+	public List<String> getPermissionsNotToHave() {
+		return permissionsNotToHave;
+	}
+
+	public void setPermissionsNotToHave(List<String> permissionNotToHave) {
+		this.permissionsNotToHave = permissionNotToHave;
 	}
 	
 }
